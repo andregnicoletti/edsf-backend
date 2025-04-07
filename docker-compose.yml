@@ -1,0 +1,44 @@
+services:
+
+  edsf-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: local/edsf-api
+    restart: always
+    ports:
+      - ${NODE_PORT:-3333}:${NODE_PORT:-3333}
+    depends_on:
+      - edsf-pg
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./logs:/usr/src/srv/logs
+      - ./conf:/usr/src/srv/conf
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+  edsf-pg:
+    image: postgres:16.4
+    restart: always
+    ports:
+      - ${DATABASE_PORT:-5432}:${DATABASE_PORT:-5432}
+    environment:
+      POSTGRES_PASSWORD: "the_hardest_password_in_the_universe"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: postgres -c listen_addresses='*' -c port=${DATABASE_PORT:-5432}
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+

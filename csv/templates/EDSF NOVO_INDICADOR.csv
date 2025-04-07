@@ -1,0 +1,3 @@
+#Dica: Campos separados por virgula ou ponto e virgula. * Indica os campos obrigatórios e os dados informados devem estar de acordo com a instrução descrita no cabeçalho. Preenchimento a partir da linha 4;;;;
+# *(Alfanumerico. Tamanho 4. Deve ser único);*(Alfanumerico. Tamanho 50);*(CAD_ORGANIZACAO);*(preencher NOVO_INDICADOR);
+CODIGO_INDICADOR;DESC_INDICADOR;CODIGO_ORGANIZACAO;TIPO_CADASTRO; 

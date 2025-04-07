@@ -1,0 +1,3 @@
+#Dica: Campos separados por virgula ou ponto e virgula. * Indica os campos obrigatórios e os dados informados devem estar de acordo com a instrução descrita no cabeçalho. Preenchimento a partir da linha 4 ;;;;;;;
+# *;*(CAD_CURSO);*(DD/MM/AAAA);*(DD/MM/AAAA);*(DD/MM/AAAA);*(Texto. Tamanho 35);*(Texto. Tamanho 2);*(preencher NOVO_TRABALHADOR_CURSO) 
+CPF;CODIGO_CURSO;DATA_INSCRICAO;DATA_ULT_ACESSO;DATA_CONCLUSAO;CIDADE;UF;TIPO_CADASTRO

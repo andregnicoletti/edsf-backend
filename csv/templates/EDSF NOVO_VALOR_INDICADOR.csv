@@ -1,0 +1,3 @@
+#Dica: Campos separados por virgula ou ponto e virgula. * Indica os campos obrigatórios e os dados informados devem estar de acordo com a instrução descrita no cabeçalho. Preenchimento a partir da linha 4 ;;;;
+# *(CAD_PRODUTOR);*(CAD_INDICADOR);*(Numero decimal);*(AAAA);*(preencher NOVO_VALOR_INDICADOR) 
+CODIGO_PRODUTOR;CODIGO_INDICADOR;VALOR_INDICADOR;ANO_SUMARIZACAO;TIPO_CADASTRO

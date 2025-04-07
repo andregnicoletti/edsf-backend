@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "CAD_USUARIO" ADD COLUMN     "PERFIL" TEXT NOT NULL DEFAULT 'organization';

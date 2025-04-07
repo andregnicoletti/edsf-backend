@@ -1,0 +1,241 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ChannelLeadsEntity {
+  id          String @id @default(uuid()) @map("ID_CANAL")
+  channelName String @unique @map("DESC_CANAL")
+
+  @@map("CAD_CANAL_LEADS")
+}
+
+model StateEntity {
+  id    String @id @default(uuid()) @map("ID_UF")
+  state String @unique @map("UF")
+
+  cities CityEntity[]
+
+  @@map("CAD_UF")
+}
+
+model CityEntity {
+  id             String  @id @default(uuid()) @map("ID_CIDADE")
+  city           String  @map("CIDADE")
+  cityNormalized String? @map("CIDADE_NORMALIZADA")
+
+  state    StateEntity @relation(fields: [state_id], references: [id])
+  state_id String      @map("ID_UF")
+
+  workerCourseAssocEntity WorkerCourseAssocEntity[]
+  producers               ProducerEntity[]
+
+  @@map("CAD_CIDADE")
+}
+
+model CourseEntity {
+  id                String  @id @default(uuid()) @map("ID_CURSO")
+  courseDescription String  @map("DESC_CURSO")
+  numberClass       Int     @map("QTD_AULAS")
+  averageDuration   Decimal @map("DURACAO_MEDIA")
+  code              String  @unique @map("CODIGO")
+
+  workers   WorkerCourseAssocEntity[]
+  indicator IndicatorCourseAssocEntity[]
+
+  @@map("CAD_CURSO")
+}
+
+model WorkerCourseAssocEntity {
+  cpf              String    @map("CPF")
+  registrationDate DateTime  @map("DATA_INSCRICAO")
+  completionDate   DateTime? @map("DATA_CONCLUSAO")
+  lastAccessDate   DateTime? @map("DATA_ULT_ACESSO")
+
+  course    CourseEntity @relation(fields: [course_id], references: [id])
+  course_id String       @map("ID_CURSO")
+
+  city    CityEntity @relation(fields: [city_id], references: [id])
+  city_id String     @map("ID_CIDADE")
+
+  @@id([cpf, course_id, registrationDate])
+  @@map("ASSOC_TRABALHADOR_CURSO")
+}
+
+model UserEntity {
+  id                String    @id @default(uuid()) @map("ID_USUARIO")
+  email             String    @map("EMAIL")
+  phone             String    @map("DDCELULARSMS")
+  code              String?   @map("CODIGO")
+  lgpdAgreementDate DateTime? @map("DATA_CONSENTIMENTO_LGPD")
+  lgpdConsent       Boolean?  @map("CONSENTIMENTO_LGPD")
+  role              String    @default("organization") @map("PERFIL")
+
+  company    CompanyEntity   @relation(fields: [company_id], references: [id])
+  company_id String          @map("ID_ORGANIZACAO")
+  session    SessionEntity[]
+
+  @@map("CAD_USUARIO")
+}
+
+model CompanyEntity {
+  id                 String @id @default(uuid()) @map("ID_ORGANIZACAO")
+  companyDescription String @map("DESC_ORGANIZACAO")
+  businessSegment    String @default("") @map("SEGMENTO_NEGOCIO")
+  code               String @unique @map("CODIGO_ORGANIZACAO")
+
+  users        UserEntity[]
+  indicators   IndicatorEntity[]
+  producers    ProducerEntity[]
+  panels       PanelEntity[]
+  UploadEntity UploadEntity[]
+
+  @@map("CAD_ORGANIZACAO")
+}
+
+model IndicatorEntity {
+  id                   String @id @default(uuid()) @map("ID_INDICADOR")
+  indicatorDescription String @map("DESC_INDICADOR")
+  code                 String @unique @map("CODIGO_INDICADOR")
+
+  indicator         IndicatorCourseAssocEntity[]
+  goalIndicator     GoalIndicatorEntity[]
+  indicatorValueSum IndicatorValueSumEntity[]
+
+  company    CompanyEntity @relation(fields: [company_id], references: [id])
+  company_id String        @map("ID_ORGANIZACAO")
+
+  @@map("CAD_INDICADOR")
+}
+
+model IndicatorCourseAssocEntity {
+  indicatorId String          @map("ID_INDICADOR")
+  courseId    String          @map("ID_CURSO")
+  indicators  IndicatorEntity @relation(fields: [indicatorId], references: [id])
+  courses     CourseEntity    @relation(fields: [courseId], references: [id])
+
+  @@id([indicatorId, courseId])
+  @@map("ASSOC_INDICADOR_CURSO")
+}
+
+model WorkerProducersAssocEntity {
+  cpf       String    @unique @map("CPF")
+  startDate DateTime  @map("DATA_INICIO")
+  endDate   DateTime? @map("DATA_FIM")
+
+  producer    ProducerEntity @relation(fields: [producer_id], references: [id])
+  producer_id String         @map("ID_PRODUTOR")
+
+  @@map("ASSOC_TRABALHADOR_PRODUTOR")
+}
+
+model ProducerEntity {
+  id          String  @id @default(uuid()) @map("ID_PRODUTOR")
+  code        String  @unique @map("CODIGO_PRODUTOR")
+  description String? @map("DESC_PRODUTOR")
+
+  company    CompanyEntity @relation(fields: [company_id], references: [id])
+  company_id String        @map("ID_ORGANIZACAO")
+
+  city    CityEntity @relation(fields: [city_id], references: [id])
+  city_id String     @map("ID_CIDADE")
+
+  workerProducersAssocEntity WorkerProducersAssocEntity[]
+
+  goalIndicator     GoalIndicatorEntity[]
+  indicatorValueSum IndicatorValueSumEntity[]
+
+  @@map("CAD_PRODUTOR")
+}
+
+model GoalIndicatorEntity {
+  goalYear               String  @map("ANO_META")
+  goal                   Decimal @map("META")
+  percentageAccomplished Decimal @map("PERCENTUAL_REALIZADO")
+  code                   String  @unique @map("CODIGO_META")
+
+  producer   ProducerEntity @relation(fields: [producerId], references: [id])
+  producerId String         @map("ID_PRODUTOR")
+
+  indicator   IndicatorEntity @relation(fields: [indicatorId], references: [id])
+  indicatorId String          @map("ID_INDICADOR")
+
+  @@id([goalYear, indicatorId, producerId])
+  @@map("CAD_INDICADOR_META")
+}
+
+model IndicatorValueSumEntity {
+  indicatorValue Decimal @map("VALOR_INDICADO")
+  summaryGrouper String  @map("ANO_SUMARIZACAO")
+
+  producer    ProducerEntity @relation(fields: [producer_id], references: [id])
+  producer_id String         @map("ID_PRODUTOR")
+
+  indicator    IndicatorEntity @relation(fields: [indicator_id], references: [id])
+  indicator_id String          @map("ID_INDICADOR")
+
+  @@id([producer_id, indicator_id, summaryGrouper])
+  @@map("SUM_VALOR_INDICADOR")
+}
+
+model UploadEntity {
+  id       String       @id @default(uuid()) @map("ID_ARQUIVO")
+  code     String       @map("UPLOAD_CODE")
+  fileName String       @default("sample.csv") @map("NOME_ARQUIVO")
+  uploadId String       @map("UPLOAD_ID")
+  status   Boolean      @map("STATUS")
+  event    String       @map("EVENTO")
+  date     DateTime     @default(now()) @map("DATA")
+  cells    CellEntity[] @relation("UPLOAD_CELLS")
+
+  company    CompanyEntity @relation(fields: [company_id], references: [id])
+  company_id String        @map("ID_ORGANIZACAO")
+
+  @@map("CONTROLE_UPLOAD")
+}
+
+model CellEntity {
+  id     String         @id @default(uuid()) @map("ID_DATA")
+  name   String         @map("NOME")
+  value  String         @map("VALOR")
+  sheets UploadEntity[] @relation("UPLOAD_CELLS")
+
+  @@map("DATA_UPLOAD")
+}
+
+model PanelEntity {
+  id            String        @id @default(uuid()) @map("ID_PAINEL")
+  name          String        @map("NOME_PAINEL")
+  type          String        @map("TIPO_PAINEL") // e.g., "bar_chart", "line_chart", etc.
+  configuration String        @map("CONFIGURACAO")
+  company       CompanyEntity @relation(fields: [companyId], references: [id])
+  companyId     String        @map("ID_ORGANIZACAO")
+  userId        String        @map("ID_USUARIO")
+  createdAt     DateTime      @default(now()) @map("DATA_CRIACAO")
+  updatedAt     DateTime      @updatedAt @map("DATA_ATUALIZACAO")
+
+  @@map("PAINEL")
+}
+
+model SessionEntity {
+  id        Int      @id @default(autoincrement()) @map("ID_SESSAO") // Chave primária
+  token     String   @map("TOKEN") // Token JWT
+  valid     Boolean  @default(true) @map("SESSAO_VALIDA") // Sessão válida ou inválida
+  createdAt DateTime @default(now()) @map("DATA_ATUALIZACAO") // Data de criação
+
+  // Relacionamento com a tabela de usuários
+  userId String     @map("ID_USUARIO") // Relacionado ao usuário (UUID)
+  user   UserEntity @relation(fields: [userId], references: [id])
+
+  @@map("SESSOES") // Mapeia o nome da tabela para "sessions"
+}
