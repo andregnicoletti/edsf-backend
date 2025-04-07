@@ -1,5 +1,5 @@
 
-# EDUCATION DATA SCIENCE ON THE FARM (EDSF)
+# EDSF
 
 ## Pré-requisitos
 
@@ -10,28 +10,18 @@ Certifique-se de que você tem o seguinte instalado em sua máquina:
 
 ## Configuração
 
-### 1. Clonar o repositório
-
-Primeiro, clone o repositório do projeto:
-
-```bash
-git clone ssh://git@bitbucket.cpqd.com.br:7999/edsf/jaentendi-edsf-backend.git
-
-cd jaentendi-edsf-backend
-```
-
-### 2. Criar um arquivo .env
+### 1. Criar um arquivo .env
 Criar arquivo `.env` a partir do arquivo `.env.example`
 ```bash
 cp .env.example .env
 ```
 
-### 3. Construir e rodar o projeto
+### 2. Construir e rodar o projeto
 ```bash
 docker compose up -d
 ```
 
-### 4. Parar e remover containers
+### 3. Parar e remover containers
 ```bash
 docker compose down
 ```
